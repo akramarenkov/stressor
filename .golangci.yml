@@ -59,4 +59,3 @@ linters:
     - whitespace
     - wsl
     - zerologlint
-    
