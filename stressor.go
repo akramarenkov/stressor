@@ -13,10 +13,9 @@ import (
 
 const (
 	lockersGroupNumber = 2
-	pauseToOnLoad      = time.Second
 )
 
-// Minimal values.
+// Just used the minimum values for *Factor options.
 const (
 	DefaultAllocFactor    = 1
 	DefaultAllocSize      = 10
@@ -26,6 +25,9 @@ const (
 )
 
 // Options of the created Stressor instance.
+//
+// With some parameters, the duration of the program execution may become
+// indefinitely long.
 type Opts struct {
 	// Determines how many times there will be more goroutines performing memory
 	// allocations than logical processors. Loads the garbage collector
@@ -81,7 +83,8 @@ type Stressor struct {
 
 // Creates and run Stressor instance.
 //
-// Completion of the function means that the load is already present.
+// Completion of the function means that the load is already present. To be completely
+// sure of this, you can take a short pause before running the main code.
 func New(opts Opts) *Stressor {
 	opts = opts.normalize()
 
@@ -101,8 +104,6 @@ func New(opts Opts) *Stressor {
 
 func (strs *Stressor) waitLoad() {
 	<-strs.onLoad
-
-	time.Sleep(pauseToOnLoad)
 }
 
 // Terminates work of the Stressor.
@@ -187,7 +188,11 @@ func (strs *Stressor) forwarder(
 
 	starter.Set()
 
-	forward <- 0
+	select {
+	case <-strs.breaker.IsBreaked():
+		return
+	case forward <- 0:
+	}
 
 	for {
 		select {

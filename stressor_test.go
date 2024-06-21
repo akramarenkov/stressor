@@ -34,8 +34,6 @@ func TestStressorComparative(t *testing.T) {
 	require.Greater(t, withoutLoad, withLoad)
 }
 
-// Automatic selection of the b.N does not work in this case, so you need
-// to manually specify the number of iterations using the option -benchtime=Nx.
 func BenchmarkStressor(b *testing.B) {
 	stressor, _, err := prepareStressor()
 	require.NoError(b, err)
