@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"sync"
 	"time"
+	"unsafe"
 
 	"github.com/akramarenkov/breaker"
 	"github.com/akramarenkov/starter"
@@ -15,13 +16,13 @@ const (
 	lockersGroupNumber = 2
 )
 
-// Just used the minimum values for *Factor options.
+// Just used the minimum values.
 const (
 	DefaultAllocFactor    = 1
-	DefaultAllocSize      = 10
+	DefaultAllocSize      = int(unsafe.Sizeof(int(0)))
 	DefaultLockFactor     = 1
 	DefaultScheduleFactor = 1
-	DefaultScheduleSleep  = 10 * time.Nanosecond
+	DefaultScheduleSleep  = time.Nanosecond
 )
 
 // Options of the created Stressor instance.
