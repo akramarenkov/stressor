@@ -6,7 +6,6 @@ import (
 	"runtime"
 	"sync"
 	"time"
-	"unsafe"
 
 	"github.com/akramarenkov/breaker"
 	"github.com/akramarenkov/starter"
@@ -19,7 +18,7 @@ const (
 // Just used the minimum values.
 const (
 	DefaultAllocFactor    = 1
-	DefaultAllocSize      = int(unsafe.Sizeof(int(0)))
+	DefaultAllocSize      = 1
 	DefaultLockFactor     = 1
 	DefaultScheduleFactor = 1
 	DefaultScheduleSleep  = time.Nanosecond
