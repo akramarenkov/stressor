@@ -127,11 +127,7 @@ func (strs *Stressor) loop() {
 
 	allocators := strs.opts.AllocFactor * runtime.NumCPU()
 
-	lockers := divideWithMin(
-		strs.opts.LockFactor*runtime.NumCPU(),
-		lockersGroupNumber,
-		1,
-	)
+	lockers := max(strs.opts.LockFactor*runtime.NumCPU()/lockersGroupNumber, 1)
 
 	planned := strs.opts.ScheduleFactor * runtime.NumCPU()
 
