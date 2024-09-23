@@ -1,6 +1,6 @@
 module github.com/akramarenkov/stressor
 
-go 1.22.4
+go 1.23
 
 require (
 	github.com/akramarenkov/breaker v0.1.0
