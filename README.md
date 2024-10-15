@@ -2,7 +2,7 @@
 
 [![Go Reference](https://pkg.go.dev/badge/github.com/akramarenkov/stressor.svg)](https://pkg.go.dev/github.com/akramarenkov/stressor)
 [![Go Report Card](https://goreportcard.com/badge/github.com/akramarenkov/stressor)](https://goreportcard.com/report/github.com/akramarenkov/stressor)
-[![codecov](https://codecov.io/gh/akramarenkov/stressor/branch/master/graph/badge.svg?token=PqZPad4rov)](https://codecov.io/gh/akramarenkov/stressor)
+[![Coverage Status](https://coveralls.io/repos/github/akramarenkov/stressor/badge.svg)](https://coveralls.io/github/akramarenkov/stressor)
 
 ## Purpose
 
@@ -37,7 +37,6 @@ func main() {
 
     // Main code
     time.Sleep(time.Second)
-
     // Output:
 }
 ```

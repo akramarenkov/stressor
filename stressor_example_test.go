@@ -20,6 +20,5 @@ func ExampleStressor() {
 
 	// Main code
 	time.Sleep(time.Second)
-
 	// Output:
 }
