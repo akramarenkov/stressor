@@ -12,16 +12,8 @@ import (
 )
 
 const (
-	lockersGroupNumber = 2
-)
-
-// Just used the minimum values.
-const (
-	DefaultAllocFactor    = 1
-	DefaultAllocSize      = 1
-	DefaultLockFactor     = 1
-	DefaultScheduleFactor = 1
-	DefaultScheduleSleep  = time.Nanosecond
+	DefaultAllocSize     = 1
+	DefaultSleepDuration = time.Nanosecond
 )
 
 // Options of the created Stressor instance.
@@ -29,41 +21,45 @@ const (
 // With some parameters, the duration of the program execution may become
 // indefinitely long.
 type Opts struct {
-	// Determines how many times there will be more goroutines performing memory
-	// allocations than logical processors. Loads the garbage collector
-	AllocFactor int
-	// Size of memory allocated by goroutines
-	AllocSize int
-	// Determines how many times there will be more goroutines performing reads and
-	// writes to the channels than logical processors. Loads with empty wait loops
-	// and futex calls
-	LockFactor int
-	// Determines how many times there will be more goroutines that calls time.Sleep()
-	// than logical processors. Loads the scheduler
-	ScheduleFactor int
-	// Goroutines sleep duration
-	ScheduleSleep time.Duration
+	// Number of goroutines performing memory allocation. When specifying a negative or
+	// zero value, the value returned by [runtime.NumCPU] will be used. Loads the
+	// garbage collector
+	Allocators int
+	// Size of memory allocated by goroutines. When specifying a negative or zero value,
+	// the value of [DefaultAllocSize] will be used
+	AllocationSize int
+	// Number of goroutines pairs performing reads and writes to the channels. When
+	// specifying a negative or zero value, the value returned by [runtime.NumCPU] will
+	// be used. Loads by empty wait loops and futex calls
+	Lockers int
+	// Number of goroutines that calls [time.Sleep]. When specifying a negative or
+	// zero value, the value returned by [runtime.NumCPU] will be used. Loads the
+	// scheduler
+	Scheduled int
+	// Sleep duration of scheduled goroutines. When specifying a negative or
+	// zero value, the value of [DefaultSleepDuration] will be used
+	SleepDuration time.Duration
 }
 
 func (opts Opts) normalize() Opts {
-	if opts.AllocFactor == 0 {
-		opts.AllocFactor = DefaultAllocFactor
+	if opts.Allocators <= 0 {
+		opts.Allocators = runtime.NumCPU()
 	}
 
-	if opts.AllocSize == 0 {
-		opts.AllocSize = DefaultAllocSize
+	if opts.AllocationSize <= 0 {
+		opts.AllocationSize = DefaultAllocSize
 	}
 
-	if opts.LockFactor == 0 {
-		opts.LockFactor = DefaultLockFactor
+	if opts.Lockers <= 0 {
+		opts.Lockers = runtime.NumCPU()
 	}
 
-	if opts.ScheduleFactor == 0 {
-		opts.ScheduleFactor = DefaultScheduleFactor
+	if opts.Scheduled <= 0 {
+		opts.Scheduled = runtime.NumCPU()
 	}
 
-	if opts.ScheduleSleep == 0 {
-		opts.ScheduleSleep = DefaultScheduleSleep
+	if opts.SleepDuration <= 0 {
+		opts.SleepDuration = DefaultSleepDuration
 	}
 
 	return opts
@@ -125,31 +121,28 @@ func (strs *Stressor) loop() {
 
 	starter := starter.New()
 
-	allocators := strs.opts.AllocFactor * runtime.NumCPU()
-
-	lockers := max(strs.opts.LockFactor*runtime.NumCPU()/lockersGroupNumber, 1)
-
-	planned := strs.opts.ScheduleFactor * runtime.NumCPU()
-
-	for range allocators {
+	for range strs.opts.Allocators {
 		wg.Add(1)
 		starter.Ready()
 
 		go strs.allocator(wg, starter)
 	}
 
-	for range lockers {
-		wg.Add(lockersGroupNumber)
-		starter.ReadyN(lockersGroupNumber)
-
+	for range strs.opts.Lockers {
 		forward := make(chan int)
 		backward := make(chan int)
+
+		wg.Add(1)
+		wg.Add(1)
+
+		starter.Ready()
+		starter.Ready()
 
 		go strs.forwarder(wg, starter, forward, backward)
 		go strs.backwarder(wg, starter, forward, backward)
 	}
 
-	for range planned {
+	for range strs.opts.Scheduled {
 		wg.Add(1)
 		starter.Ready()
 
@@ -170,7 +163,7 @@ func (strs *Stressor) allocator(
 	starter.Set()
 
 	for !strs.breaker.IsStopped() {
-		_ = make([]byte, strs.opts.AllocSize)
+		_ = make([]byte, strs.opts.AllocationSize)
 	}
 }
 
@@ -237,6 +230,6 @@ func (strs *Stressor) planned(
 	starter.Set()
 
 	for !strs.breaker.IsStopped() {
-		time.Sleep(strs.opts.ScheduleSleep)
+		time.Sleep(strs.opts.SleepDuration)
 	}
 }

@@ -1,6 +1,7 @@
 package stressor
 
 import (
+	"runtime"
 	"testing"
 	"time"
 
@@ -34,6 +35,44 @@ func TestStressorComparative(t *testing.T) {
 	require.Greater(t, withoutLoad, withLoad)
 }
 
+func TestStressorQuickCompletion(t *testing.T) {
+	stressor, _, err := prepareStressor()
+	require.NoError(t, err)
+
+	stressor.Stop()
+}
+
+func TestOptsNormalize(t *testing.T) {
+	defaulted := Opts{
+		Allocators:     runtime.NumCPU(),
+		AllocationSize: DefaultAllocSize,
+		Lockers:        runtime.NumCPU(),
+		Scheduled:      runtime.NumCPU(),
+		SleepDuration:  DefaultSleepDuration,
+	}
+
+	zero := Opts{}
+	require.Equal(t, defaulted, zero.normalize())
+
+	negative := Opts{
+		Allocators:     -1,
+		AllocationSize: -1,
+		Lockers:        -1,
+		Scheduled:      -1,
+		SleepDuration:  -time.Nanosecond,
+	}
+	require.Equal(t, defaulted, negative.normalize())
+
+	custom := Opts{
+		Allocators:     10 * runtime.NumCPU(),
+		AllocationSize: 2 * DefaultAllocSize,
+		Lockers:        10 * runtime.NumCPU(),
+		Scheduled:      10 * runtime.NumCPU(),
+		SleepDuration:  2 * DefaultSleepDuration,
+	}
+	require.Equal(t, custom, custom.normalize())
+}
+
 func BenchmarkStressor(b *testing.B) {
 	stressor, _, err := prepareStressor()
 	require.NoError(b, err)
@@ -45,11 +84,11 @@ func BenchmarkStressor(b *testing.B) {
 
 func prepareStressor() (*Stressor, time.Duration, error) {
 	type config struct {
-		AllocFactor    int           `env:"STRESSOR_ALLOC_FACTOR"`
-		AllocSize      int           `env:"STRESSOR_ALLOC_SIZE"`
-		LockFactor     int           `env:"STRESSOR_LOCK_FACTOR"`
-		ScheduleFactor int           `env:"STRESSOR_SCHED_FACTOR"`
-		ScheduleSleep  time.Duration `env:"STRESSOR_SCHED_SLEEP"`
+		Allocators     int           `env:"STRESSOR_ALLOCATORS"`
+		AllocationSize int           `env:"STRESSOR_ALLOCATION_SIZE"`
+		Lockers        int           `env:"STRESSOR_LOCKERS"`
+		Scheduled      int           `env:"STRESSOR_SCHEDULED"`
+		SleepDuration  time.Duration `env:"STRESSOR_SLEEP_DURATION"`
 		TestDuration   time.Duration `env:"STRESSOR_TEST_DURATION"`
 	}
 
@@ -61,11 +100,11 @@ func prepareStressor() (*Stressor, time.Duration, error) {
 	}
 
 	opts := Opts{
-		AllocFactor:    cfg.AllocFactor,
-		AllocSize:      cfg.AllocSize,
-		LockFactor:     cfg.LockFactor,
-		ScheduleFactor: cfg.ScheduleFactor,
-		ScheduleSleep:  cfg.ScheduleSleep,
+		Allocators:     cfg.Allocators,
+		AllocationSize: cfg.AllocationSize,
+		Lockers:        cfg.Lockers,
+		Scheduled:      cfg.Scheduled,
+		SleepDuration:  cfg.SleepDuration,
 	}
 
 	stressor := New(opts)
