@@ -25,11 +25,11 @@ import (
 
 func main() {
     opts := stressor.Opts{
-        AllocFactor:    1,
-        AllocSize:      1,
-        LockFactor:     1,
-        ScheduleFactor: 1,
-        ScheduleSleep:  time.Nanosecond,
+        Allocators:     1,
+        AllocationSize: 2,
+        Lockers:        1,
+        Scheduled:      1,
+        SleepDuration:  10 * time.Nanosecond,
     }
 
     stressor := stressor.New(opts)

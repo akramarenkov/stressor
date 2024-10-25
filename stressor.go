@@ -146,7 +146,7 @@ func (strs *Stressor) loop() {
 		wg.Add(1)
 		starter.Ready()
 
-		go strs.planned(wg, starter)
+		go strs.scheduled(wg, starter)
 	}
 
 	starter.Go()
@@ -221,7 +221,7 @@ func (strs *Stressor) backwarder(
 	}
 }
 
-func (strs *Stressor) planned(
+func (strs *Stressor) scheduled(
 	wg *sync.WaitGroup,
 	starter *starter.Starter,
 ) {
