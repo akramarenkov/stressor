@@ -45,7 +45,7 @@ func TestStressorQuickCompletion(t *testing.T) {
 func TestOptsNormalize(t *testing.T) {
 	defaulted := Opts{
 		Allocators:     runtime.NumCPU(),
-		AllocationSize: DefaultAllocSize,
+		AllocationSize: DefaultAllocationSize,
 		Lockers:        runtime.NumCPU(),
 		Scheduled:      runtime.NumCPU(),
 		SleepDuration:  DefaultSleepDuration,
@@ -65,7 +65,7 @@ func TestOptsNormalize(t *testing.T) {
 
 	custom := Opts{
 		Allocators:     10 * runtime.NumCPU(),
-		AllocationSize: 2 * DefaultAllocSize,
+		AllocationSize: 2 * DefaultAllocationSize,
 		Lockers:        10 * runtime.NumCPU(),
 		Scheduled:      10 * runtime.NumCPU(),
 		SleepDuration:  2 * DefaultSleepDuration,

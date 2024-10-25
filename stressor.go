@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	DefaultAllocSize     = 1
-	DefaultSleepDuration = time.Nanosecond
+	DefaultAllocationSize = 1
+	DefaultSleepDuration  = time.Nanosecond
 )
 
 // Options of the created Stressor instance.
@@ -47,7 +47,7 @@ func (opts Opts) normalize() Opts {
 	}
 
 	if opts.AllocationSize <= 0 {
-		opts.AllocationSize = DefaultAllocSize
+		opts.AllocationSize = DefaultAllocationSize
 	}
 
 	if opts.Lockers <= 0 {
