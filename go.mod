@@ -3,8 +3,8 @@ module github.com/akramarenkov/stressor
 go 1.23
 
 require (
-	github.com/akramarenkov/breaker v0.1.0
-	github.com/akramarenkov/starter v0.1.0
+	github.com/akramarenkov/breaker v0.1.2
+	github.com/akramarenkov/starter v0.2.0
 	github.com/caarlos0/env/v10 v10.0.0
 	github.com/stretchr/testify v1.9.0
 )

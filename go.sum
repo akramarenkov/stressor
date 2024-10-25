@@ -1,7 +1,7 @@
-github.com/akramarenkov/breaker v0.1.0 h1:juMtX7qRtQEYopHUES81qQ53L4zXfNvt+LwcXmEtbYo=
-github.com/akramarenkov/breaker v0.1.0/go.mod h1:tJ7DkgyIqv99O02LeQtrUWLnKr9cQ8U0OgJXMZT2zrw=
-github.com/akramarenkov/starter v0.1.0 h1:AYTQaeMtTPsoZDF9xaA0iTzlbAY/XEf496KcY4IkmA4=
-github.com/akramarenkov/starter v0.1.0/go.mod h1:Nq5w6VILJubbCrGm8pZUCiQcGW92icN6iYW6cLV00u8=
+github.com/akramarenkov/breaker v0.1.2 h1:L8xC2aTQwS3IQiyg5tXE0HbBv6HjLrn4Aqwit79E7fY=
+github.com/akramarenkov/breaker v0.1.2/go.mod h1:SmNRpU2yUKa0S29rtwtvI0wbawyYfcO0kDWko0WjEBI=
+github.com/akramarenkov/starter v0.2.0 h1:Ku7oTcLhwKJMTq0dWvLzezdu1J+PHY58f//2BMoj6PY=
+github.com/akramarenkov/starter v0.2.0/go.mod h1:KIP9wN6+E0e47YwpFExBUKzdrh7gBijlo2Tvi5q4xf8=
 github.com/caarlos0/env/v10 v10.0.0 h1:yIHUBZGsyqCnpTkbjk8asUlx6RFhhEs+h7TOBdgdzXA=
 github.com/caarlos0/env/v10 v10.0.0/go.mod h1:ZfulV76NvVPw3tm591U4SwL3Xx9ldzBP9aGxzeN7G18=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
