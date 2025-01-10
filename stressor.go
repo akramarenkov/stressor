@@ -1,5 +1,5 @@
-// Imposes a load on the system and the runtime in order to provide the main
-// code with as little processor time as possible.
+// Library that provides to imposes a load on the system and the runtime in order to
+// provide the main code with as little processor time as possible.
 package stressor
 
 import (

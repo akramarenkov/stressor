@@ -6,7 +6,7 @@
 
 ## Purpose
 
-Library that allows you to imposes a load on the system and the runtime in order to provide the main code with as little processor time as possible
+Library that provides to imposes a load on the system and the runtime in order to provide the main code with as little processor time as possible
 
 This is a very simple implementation that does not adapt to performance and the features of the system and runtime
 
