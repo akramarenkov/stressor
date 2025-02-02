@@ -119,13 +119,13 @@ func (strs *Stressor) loop() {
 	wg := &sync.WaitGroup{}
 	defer wg.Wait()
 
-	starter := starter.New()
+	actuator := starter.New()
 
 	for range strs.opts.Allocators {
 		wg.Add(1)
-		starter.Ready()
+		actuator.Ready()
 
-		go strs.allocator(wg, starter)
+		go strs.allocator(wg, actuator)
 	}
 
 	for range strs.opts.Lockers {
@@ -135,32 +135,32 @@ func (strs *Stressor) loop() {
 		wg.Add(1)
 		wg.Add(1)
 
-		starter.Ready()
-		starter.Ready()
+		actuator.Ready()
+		actuator.Ready()
 
-		go strs.forwarder(wg, starter, forward, backward)
-		go strs.backwarder(wg, starter, forward, backward)
+		go strs.forwarder(wg, actuator, forward, backward)
+		go strs.backwarder(wg, actuator, forward, backward)
 	}
 
 	for range strs.opts.Scheduled {
 		wg.Add(1)
-		starter.Ready()
+		actuator.Ready()
 
-		go strs.scheduled(wg, starter)
+		go strs.scheduled(wg, actuator)
 	}
 
-	starter.Go()
+	actuator.Go()
 
 	close(strs.onLoad)
 }
 
 func (strs *Stressor) allocator(
 	wg *sync.WaitGroup,
-	starter *starter.Starter,
+	actuator *starter.Starter,
 ) {
 	defer wg.Done()
 
-	starter.Set()
+	actuator.Set()
 
 	for !strs.breaker.IsStopped() {
 		_ = make([]byte, strs.opts.AllocationSize)
@@ -169,13 +169,13 @@ func (strs *Stressor) allocator(
 
 func (strs *Stressor) forwarder(
 	wg *sync.WaitGroup,
-	starter *starter.Starter,
+	actuator *starter.Starter,
 	forward chan int,
 	backward chan int,
 ) {
 	defer wg.Done()
 
-	starter.Set()
+	actuator.Set()
 
 	select {
 	case <-strs.breaker.IsBreaked():
@@ -199,13 +199,13 @@ func (strs *Stressor) forwarder(
 
 func (strs *Stressor) backwarder(
 	wg *sync.WaitGroup,
-	starter *starter.Starter,
+	actuator *starter.Starter,
 	forward chan int,
 	backward chan int,
 ) {
 	defer wg.Done()
 
-	starter.Set()
+	actuator.Set()
 
 	for {
 		select {
@@ -223,11 +223,11 @@ func (strs *Stressor) backwarder(
 
 func (strs *Stressor) scheduled(
 	wg *sync.WaitGroup,
-	starter *starter.Starter,
+	actuator *starter.Starter,
 ) {
 	defer wg.Done()
 
-	starter.Set()
+	actuator.Set()
 
 	for !strs.breaker.IsStopped() {
 		time.Sleep(strs.opts.SleepDuration)
