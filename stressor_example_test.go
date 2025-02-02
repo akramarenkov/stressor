@@ -15,8 +15,8 @@ func ExampleStressor() {
 		SleepDuration:  10 * time.Nanosecond,
 	}
 
-	stressor := stressor.New(opts)
-	defer stressor.Stop()
+	strain := stressor.New(opts)
+	defer strain.Stop()
 
 	// Main code
 	time.Sleep(time.Second)
