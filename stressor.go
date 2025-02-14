@@ -79,6 +79,8 @@ type Stressor struct {
 
 	breaker *breaker.Breaker
 	onLoad  chan struct{}
+	starter *starter.Starter
+	wg      sync.WaitGroup
 }
 
 // Creates and run Stressor instance.
@@ -93,6 +95,7 @@ func New(opts Opts) *Stressor {
 
 		breaker: breaker.New(),
 		onLoad:  make(chan struct{}),
+		starter: starter.New(),
 	}
 
 	go strs.main()
@@ -120,66 +123,53 @@ func (strs *Stressor) main() {
 }
 
 func (strs *Stressor) loop() {
-	wg := &sync.WaitGroup{}
-	defer wg.Wait()
-
-	actuator := starter.New()
-
 	for range strs.opts.Allocators {
-		wg.Add(1)
-		actuator.Ready()
+		strs.wg.Add(1)
+		strs.starter.Ready()
 
-		go strs.allocator(wg, actuator)
+		go strs.allocator()
 	}
 
 	for range strs.opts.Lockers {
 		forward := make(chan int)
 		backward := make(chan int)
 
-		wg.Add(1)
-		wg.Add(1)
+		strs.wg.Add(1)
+		strs.wg.Add(1)
 
-		actuator.Ready()
-		actuator.Ready()
+		strs.starter.Ready()
+		strs.starter.Ready()
 
-		go strs.forwarder(wg, actuator, forward, backward)
-		go strs.backwarder(wg, actuator, forward, backward)
+		go strs.forwarder(forward, backward)
+		go strs.backwarder(forward, backward)
 	}
 
 	for range strs.opts.Scheduled {
-		wg.Add(1)
-		actuator.Ready()
+		strs.wg.Add(1)
+		strs.starter.Ready()
 
-		go strs.scheduled(wg, actuator)
+		go strs.scheduled()
 	}
 
-	actuator.Go()
+	strs.starter.Go()
 
 	close(strs.onLoad)
 }
 
-func (strs *Stressor) allocator(
-	wg *sync.WaitGroup,
-	actuator *starter.Starter,
-) {
-	defer wg.Done()
+func (strs *Stressor) allocator() {
+	defer strs.wg.Done()
 
-	actuator.Set()
+	strs.starter.Set()
 
 	for !strs.breaker.IsStopped() {
 		_ = make([]byte, strs.opts.AllocationSize)
 	}
 }
 
-func (strs *Stressor) forwarder(
-	wg *sync.WaitGroup,
-	actuator *starter.Starter,
-	forward chan int,
-	backward chan int,
-) {
-	defer wg.Done()
+func (strs *Stressor) forwarder(forward, backward chan int) {
+	defer strs.wg.Done()
 
-	actuator.Set()
+	strs.starter.Set()
 
 	select {
 	case <-strs.breaker.IsBreaked():
@@ -201,15 +191,10 @@ func (strs *Stressor) forwarder(
 	}
 }
 
-func (strs *Stressor) backwarder(
-	wg *sync.WaitGroup,
-	actuator *starter.Starter,
-	forward chan int,
-	backward chan int,
-) {
-	defer wg.Done()
+func (strs *Stressor) backwarder(forward, backward chan int) {
+	defer strs.wg.Done()
 
-	actuator.Set()
+	strs.starter.Set()
 
 	for {
 		select {
@@ -225,13 +210,10 @@ func (strs *Stressor) backwarder(
 	}
 }
 
-func (strs *Stressor) scheduled(
-	wg *sync.WaitGroup,
-	actuator *starter.Starter,
-) {
-	defer wg.Done()
+func (strs *Stressor) scheduled() {
+	defer strs.wg.Done()
 
-	actuator.Set()
+	strs.starter.Set()
 
 	for !strs.breaker.IsStopped() {
 		time.Sleep(strs.opts.SleepDuration)
