@@ -25,17 +25,21 @@ type Opts struct {
 	// zero value, the value returned by [runtime.NumCPU] will be used. Loads the
 	// garbage collector
 	Allocators int
+
 	// Size of memory allocated by goroutines. When specifying a negative or zero value,
 	// the value of [DefaultAllocSize] will be used
 	AllocationSize int
+
 	// Number of goroutines pairs performing reads and writes to the channels. When
 	// specifying a negative or zero value, the value returned by [runtime.NumCPU] will
 	// be used. Loads by empty wait loops and futex calls
 	Lockers int
+
 	// Number of goroutines that calls [time.Sleep]. When specifying a negative or
 	// zero value, the value returned by [runtime.NumCPU] will be used. Loads the
 	// scheduler
 	Scheduled int
+
 	// Sleep duration of scheduled goroutines. When specifying a negative or
 	// zero value, the value of [DefaultSleepDuration] will be used
 	SleepDuration time.Duration
